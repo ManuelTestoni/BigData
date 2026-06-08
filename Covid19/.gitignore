@@ -1,0 +1,31 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.egg-info/
+.ipynb_checkpoints/
+
+# Jupyter
+*.nbconvert.ipynb
+
+# Raw data (huge CSVs — not tracked)
+raw/
+*.csv
+
+# Secrets / connection config
+.env
+secrets.py
+neo4j_credentials.json
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
