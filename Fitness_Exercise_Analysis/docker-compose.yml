@@ -1,0 +1,72 @@
+# Replica set MongoDB a 3 nodi (rs0) per l'approfondimento CAP.
+#
+# I tre mongod condividono il network namespace del servizio "mongo-net":
+# in questo modo i membri del replica set sono dichiarati come
+# localhost:27017/27018/27019 e sono raggiungibili con lo stesso hostname
+# sia tra container sia dall'host (nessuna modifica a /etc/hosts).
+# Il namespace è tenuto in vita da mongo-net, quindi si può fermare
+# qualunque nodo (incluso il primary) senza perdere le porte pubblicate.
+
+services:
+  mongo-net:
+    image: alpine:3.20
+    command: sleep infinity
+    container_name: mongo-net
+    ports:
+      - "27017:27017"
+      - "27018:27018"
+      - "27019:27019"
+
+  mongo1:
+    image: mongo:7.0
+    container_name: mongo1
+    mem_limit: 2g
+    command: mongod --replSet rs0 --port 27017 --bind_ip_all --wiredTigerCacheSizeGB 1
+    network_mode: "service:mongo-net"
+    depends_on:
+      - mongo-net
+    volumes:
+      - mongo-data1:/data/db
+      - ./rs-init.js:/rs-init.js:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27017", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongo2:
+    image: mongo:7.0
+    container_name: mongo2
+    mem_limit: 2g
+    command: mongod --replSet rs0 --port 27018 --bind_ip_all --wiredTigerCacheSizeGB 1
+    network_mode: "service:mongo-net"
+    depends_on:
+      - mongo-net
+    volumes:
+      - mongo-data2:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27018", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongo3:
+    image: mongo:7.0
+    container_name: mongo3
+    mem_limit: 2g
+    command: mongod --replSet rs0 --port 27019 --bind_ip_all --wiredTigerCacheSizeGB 1
+    network_mode: "service:mongo-net"
+    depends_on:
+      - mongo-net
+    volumes:
+      - mongo-data3:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27019", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mongo-data1:
+  mongo-data2:
+  mongo-data3:

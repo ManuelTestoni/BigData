@@ -1,0 +1,21 @@
+# Ambiente virtuale Python
+venv/
+
+# Dataset Kaggle (294 MB, vedi README per il download)
+archive/
+
+# Credenziali / configurazione locale
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# Volumi Docker (replica set MongoDB)
+mongo-data*/
