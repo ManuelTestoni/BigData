@@ -572,39 +572,4 @@ sul repository indicato in nota al titolo.
 \bibliographystyle{apalike}
 \bibliography{ref}
 
-%==================================================================
-\newpage
-\appendix
-\section{Dettagli di riproduzione}
-\label{app:repro}
-
-Il repository contiene il notebook \texttt{fitness\_exercise\_analysis.ipynb}, il
-\texttt{docker-compose.yml} del replica set, lo script \texttt{rs-init.js} di
-inizializzazione e un README con i passi dettagliati. In sintesi:
-
-\begin{lstlisting}[language=bash, caption={Avvio del replica set e inizializzazione.}]
-# 1. avvio dei tre nodi
-docker compose up -d
-# 2. inizializzazione del replica set (solo la prima volta)
-docker compose exec mongo1 mongosh --port 27017 --quiet /rs-init.js
-# 3. verifica: 3 membri, 1 PRIMARY
-docker compose exec mongo1 mongosh --port 27017 --quiet \
-  --eval 'rs.status().members.forEach(m => print(m.name, m.stateStr))'
-\end{lstlisting}
-
-\begin{lstlisting}[language=bash, caption={Ambiente Python e dati.}]
-python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env          # connection string del replica set
-# il dataset (294 MB) va scaricato da Kaggle in archive/
-jupyter lab                   # eseguire le celle in ordine
-\end{lstlisting}
-
-Il dataset non è incluso nel repository (294~MB, cartella \texttt{archive/} in
-\texttt{.gitignore}): va scaricato da Kaggle~\cite{BoostcampDataset} e collocato in
-\texttt{archive/programs\_detailed\_boostcamp\_kaggle.csv}. Il notebook esegue
-dall'alto senza errori contro il replica set; la cella di RQ4 richiede Docker
-attivo sulla macchina che ospita il notebook, perché ferma e riavvia un container
-via \texttt{subprocess}.
-
 \end{document}
